@@ -14,7 +14,7 @@ import Footer from "components/Shared/Footer/Footer";
 
 export const UserContext = createContext([]);
 const App = () => {
-  const [loggedInUser, setLoggedInUser] = useState({}); 
+  const [loggedInUser, setLoggedInUser] = useState({});
   // const signOut = ()=>{
   //   setLoggedInUser({})
   // }

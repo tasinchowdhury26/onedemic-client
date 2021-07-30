@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './CreateCourse.css';
 
 const CreateCourse = () => {
+    const [courses, setCourses] = useState([]);
+
+
     return (
-        <div>
-            <h1>Create Course</h1>
+        <div className='create-course-wrapper'>
+            <h3>Create Course</h3>
+            
         </div>
     );
 };

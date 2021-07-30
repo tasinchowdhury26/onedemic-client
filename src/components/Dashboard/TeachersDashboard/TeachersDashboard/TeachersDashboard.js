@@ -6,6 +6,7 @@ import "./TeachersDashboard.css";
 // @ts-ignore
 import profilePicture from '../../../../images/longLogo.PNG'
 import ManageProfile from "components/Dashboard/Shared/ManageProfile/ManageProfile";
+import CreateExam from "../CreateExam/CreateExam";
 
 const TeachersDashboard = ( props ) => {
   const {name, profile} = props;
@@ -48,7 +49,7 @@ const TeachersDashboard = ( props ) => {
           }
           {
             viewComponent === 'createExam'?
-            <p>createExam</p>:<></>
+            <CreateExam></CreateExam>:<></>
           }
           {
             viewComponent === 'viewAllResults'?
