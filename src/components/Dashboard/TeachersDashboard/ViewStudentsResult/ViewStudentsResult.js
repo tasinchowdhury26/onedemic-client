@@ -8,4 +8,4 @@ const ViewStudentsResult = () => {
     );
 };
 
-export default ViewStudentsResult;<h3>View Student's Results</h3>
+export default ViewStudentsResult;
