@@ -17,7 +17,7 @@
   .create-exam-wrapper .quiz-set{
       border: 2px dotted grey;
       border-radius: 10px;
-      width: 430px;
+      width: 400px;
       margin: 10px;
   }
   ::-webkit-scrollbar {
