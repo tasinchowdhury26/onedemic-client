@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
+import { UserContext } from 'App';
+import React, { useContext, useState } from 'react';
+import { Container, Row, Card, Button } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import './CreateExam.css';
 
 const CreateExam = () => {
+    // @ts-ignore
+    const { loggedInUserData, courseInfo } = useContext(UserContext);
+    const [loggedInUser, setLoggedInUser] = loggedInUserData;
+    const [courseData, setCourseData] = courseInfo;
+    //these are the teacher's and courses information taken from the contextAPI
+    const [courseCode, setCourseCode] = useState('');
+
+    const [showCourses, setShowCourses] = useState(true);
+    //this will allow displaying all the courses by default
+
     const [method, setMethod] = useState('Create Quiz');
     const [disabled, setDisabled] = useState(false);
     const [error, setError] = useState(false);
     const [confirmButton, setConfirmButton] = useState(true);
+
+    console.log(loggedInUser.courses);
+    // console.log(courseData);
 
     const [quizes, setQuizes] = useState([{
         question: '',
@@ -33,11 +48,12 @@ const CreateExam = () => {
                 !quizes[i].option4 ||
                 !quizes[i].correctAnswer) {
                 setError(true);
-                alert('Please provide all questions with proper options.');
+                alert('Please provide all questions with options.');
             }
             else {
                 setConfirmButton(false);
-                console.log("Quiz :", quizes);
+                // const updatedCourse = loggedInUser.courses.exams.push(quizes);
+                // console.log("Quiz :", updatedCourse);
             }
         }
 
@@ -67,9 +83,42 @@ const CreateExam = () => {
         //post using this method
     }
 
+    const handleCreateExamButton = courseCode =>{
+        setShowCourses(false);
+        setCourseCode(courseCode);
+        console.log(courseCode);
+
+    }
+    const handleBackButton = () =>{
+        setShowCourses(true);
+        setCourseCode('');
+    }
+
     return (
         <div className='create-exam-wrapper'>
-            <h3>Create Exam</h3>
+            {
+                showCourses ?
+                    <Container>
+                        <Row md={3} xs={2} xl={4}>
+                            {
+                                loggedInUser.courses.map(eachCourse => 
+                                <Card style={{ width: '18rem' , margin:'10px'}}>
+                                <Card.Img variant="top" src={eachCourse.image.img} />
+                                <Card.Body>
+                                    <Card.Title>{eachCourse.courseName}</Card.Title>
+                                    <Card.Text>
+                                        {eachCourse.courseCode}
+                                    </Card.Text>
+                                    <Button variant="primary" onClick={() => handleCreateExamButton(eachCourse.courseCode)}>Create Exam</Button>
+                                </Card.Body>
+                            </Card>)
+                            }
+                            
+                        </Row>
+                    </Container>
+             : <>
+             <Button variant="secondary" onClick={handleBackButton}>Back</Button>
+            <h6>{`Exam for ${courseCode}`}</h6>
             <div className="quiz-method">
                 <button type="button"
                     onClick={() => setMethod('Upload')}
@@ -92,10 +141,11 @@ const CreateExam = () => {
                 {
                     method === 'Create Quiz' ?
                         <form>
+                            <p>{quizes.length} questions</p>
                             {
                                 quizes.map((quiz, index) => (
                                     <div key={index} className='quiz-set'>
-                                        <span className="badge bg-secondary m-3">#{index+1}</span>
+                                        <span className="badge bg-secondary m-3">#{index + 1}</span>
                                         <textarea
                                             name='question'
                                             value={quiz.question}
@@ -162,7 +212,7 @@ const CreateExam = () => {
                         : <>
                         </>
                 }
-            </div>
+            </div> </>}
         </div>
     );
 };

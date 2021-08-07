@@ -8,10 +8,11 @@ import profilePicture from '../../../../images/longLogo.PNG'
 import ManageProfile from "components/Dashboard/Shared/ManageProfile/ManageProfile";
 import CreateCourse from "../CreateCourse/CreateCourse";
 import CreateExam from "../CreateExam/CreateExam";
+import ManageStudents from "../ManageStudents/ManageStudents";
 
 const TeachersDashboard = ( props ) => {
   const { name, profile } = props;
-  const [ viewComponent, setviewComponent] = useState('createCourse')
+  const [ viewComponent, setviewComponent] = useState('manageStudents')
   return (
     <div>
       <div className="teacher-dashboard">
@@ -58,7 +59,7 @@ const TeachersDashboard = ( props ) => {
           }
           {
             viewComponent === 'manageStudents'?
-            <p>manageStudents</p>:<></>
+            <ManageStudents></ManageStudents>:<></>
           }
           {
             viewComponent === 'chat'?
