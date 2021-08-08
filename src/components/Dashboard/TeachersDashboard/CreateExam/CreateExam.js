@@ -1,9 +1,15 @@
+import "date-fns";
+import DateFnsUtils from "@date-io/date-fns";
 import { UserContext } from "App";
 import React, { useContext, useState } from "react";
 import { Container, Row, Card, Button } from "react-bootstrap";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import {
+  MuiPickersUtilsProvider,
+  KeyboardTimePicker,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
 import "./CreateExam.css";
+import { Grid } from "@material-ui/core";
 
 const CreateExam = () => {
   // @ts-ignore
@@ -14,12 +20,17 @@ const CreateExam = () => {
 
   const [courseCode, setCourseCode] = useState("");
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
 
-  const [showExamCreator, setShowExamCreator] = useState(false);
+  const dateAndTime = {selectedDate, startTime, endTime};
+  // Here is all the time credentials
 
   const [showCourses, setShowCourses] = useState(true);
-  //this will allow displaying all the courses by default
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [showExamCreator, setShowExamCreator] = useState(false);
+  //Decide what to show
 
   const [method, setMethod] = useState("Select Method");
   const [disabled, setDisabled] = useState(false);
@@ -30,7 +41,6 @@ const CreateExam = () => {
 
   const [quizes, setQuizes] = useState([
     {
-      date: selectedDate,
       question: "",
       option1: "",
       option2: "",
@@ -56,9 +66,12 @@ const CreateExam = () => {
         !quizes[i].option2 ||
         !quizes[i].option3 ||
         !quizes[i].option4 ||
-        !quizes[i].correctAnswer
-      ) {
-        alert("Please provide all questions with options.");
+        !quizes[i].correctAnswer ||
+        quizes[i].option1 !== quizes[i].correctAnswer ||
+        quizes[i].option2 !== quizes[i].correctAnswer ||
+        quizes[i].option3 !== quizes[i].correctAnswer ||
+        quizes[i].option4 !== quizes[i].correctAnswer) {
+        alert("Please provide all questions and check the correct answer.");
       } else {
         setConfirmButton(false);
         // const updatedCourse = loggedInUser.courses.exams.push(quizes);
@@ -70,7 +83,6 @@ const CreateExam = () => {
     setQuizes([
       ...quizes,
       {
-        date: selectedDate,
         question: "",
         option1: "",
         option2: "",
@@ -95,22 +107,31 @@ const CreateExam = () => {
     console.log(quizes);
     //post using this method
   };
-  const handleSelectDateButton = () => {
-    setShowCourses(false);
-  };
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    setShowExamCreator(true);
+    console.log(date);
     // console.log(quizes[0].date);
   };
-  const handleCreateExamButton = (courseCode) => {
+  const handleSelectExamDateButton = (courseCode) => {
     setCourseCode(courseCode);
-    // console.log(courseCode);
+    console.log(courseCode);
+    setShowCourses(false);
+    setShowCalendar(true);
   };
-  const handleBackButton = () => {
-    setShowCourses(true);
-    setShowExamCreator(false);
+  const handleBackToCoursesButton = () => {
     setCourseCode("");
+    setShowCourses(true);
+    setShowCalendar(false);
+    setShowExamCreator(false);
+  };
+  const handleCreateExamButton = () =>{
+    setShowCalendar(false);
+    setShowExamCreator(true);
+  }
+  const handleBackToCalendarButton = () => {
+    setShowCourses(false);
+    setShowExamCreator(false);
+    setShowCalendar(true);
   };
 
   return (
@@ -120,11 +141,17 @@ const CreateExam = () => {
           <Row md={3} xs={2} xl={4}>
             {loggedInUser.courses.map((eachCourse) => (
               <Card style={{ width: "18rem", margin: "10px" }}>
-                <Card.Img variant="top" src={`data:image/png;base64,${eachCourse.image.img}`}/>
+                <Card.Img
+                  variant="top"
+                  src={`data:image/png;base64,${eachCourse.image.img}`}
+                />
                 <Card.Body>
                   <Card.Title>{eachCourse.courseName}</Card.Title>
                   <Card.Text>{eachCourse.courseCode}</Card.Text>
-                  <Button variant="primary" onClick={handleSelectDateButton}>
+                  <Button
+                    variant="primary"
+                    onClick={handleSelectExamDateButton}
+                  >
                     Select Exam Date
                   </Button>
                 </Card.Body>
@@ -133,25 +160,84 @@ const CreateExam = () => {
           </Row>
         </Container>
       ) : (
+        <></>
+      )}
+      {showCalendar ? (
         <Container>
           <Button
             className="text-danger bg-warning m-2 px-3 rounded"
-            onClick={handleBackButton}
+            onClick={handleBackToCoursesButton}
           >
-            <b>&larr;</b> BACK
+            <b>&larr;</b> Back to courses
           </Button>
-          <Calendar onChange={handleDateChange} />
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <Grid container justifyContent="space-around">
+              <KeyboardDatePicker
+                disableToolbar
+                variant="inline"
+                format="MM/dd/yyyy"
+                margin="normal"
+                id="date-picker-inline"
+                label="Choose Exam Date"
+                value={selectedDate}
+                onChange={setSelectedDate}
+                KeyboardButtonProps={{
+                  "aria-label": "change date",
+                }}
+              />
+              <KeyboardTimePicker
+                margin="normal"
+                id="start-time-picker"
+                label="Start Time"
+                value={startTime}
+                onChange={(t) => setStartTime(t.getTime())}
+                KeyboardButtonProps={{
+                  "aria-label": "change time",
+                }}
+              />
+              <KeyboardTimePicker
+                margin="normal"
+                id="end-time-picker"
+                label="End Time"
+                value={endTime}
+                onChange={(t) => setEndTime(t.getTime())}
+                KeyboardButtonProps={{
+                  "aria-label": "change time",
+                }}
+              />{" "}
+              <br />
+              <div>
+                <h2>
+                  <span className="badge bg-secondary m-3">
+                    Start time: {new Date(startTime).getHours()}:
+                    {new Date(startTime).getMinutes()}
+                  </span>
+                </h2>
+                <h2>
+                  <span className="badge bg-secondary m-3">
+                    End Time: {new Date(endTime).getHours()}:
+                    {new Date(endTime).getMinutes()}
+                  </span>
+                </h2>
+              </div>
+            </Grid>
+          </MuiPickersUtilsProvider>
+          {
+            selectedDate && startTime && endTime ?
+              <Button variant="primary" onClick={handleCreateExamButton}>Create Exam</Button> : <></>
+          }
+          
         </Container>
+      ) : (
+        <></>
       )}
-      {
-          showExamCreator ? 
-          (
-              <section>
+      {showExamCreator ? (
+        <section>
           <Button
             className="text-danger bg-warning m-2 px-3 rounded"
-            onClick={handleBackButton}
+            onClick={handleBackToCalendarButton}
           >
-            <b>&larr;</b> BACK
+            <b>&larr;</b> Back to calendar
           </Button>
           <br />
           <br />
@@ -209,8 +295,17 @@ const CreateExam = () => {
                       <div key={index} className="quiz-set">
                         <span className="badge bg-secondary m-3">
                           marks
-                          <input name="marks" id="marks" value={quiz.marks}
-                          onChange={(event) => handleChangeInput(index, event)} type="number" max="10" min="1" />
+                          <input
+                            name="marks"
+                            id="marks"
+                            value={quiz.marks}
+                            onChange={(event) =>
+                              handleChangeInput(index, event)
+                            }
+                            type="number"
+                            max="10"
+                            min="1"
+                          />
                         </span>
                         <textarea
                           name="question"
@@ -320,7 +415,9 @@ const CreateExam = () => {
             )}
           </div>
         </section>
-          ) : <></>} 
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
