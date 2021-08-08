@@ -133,6 +133,16 @@ const CreateExam = () => {
     setShowExamCreator(false);
     setShowCalendar(true);
   };
+  const handlePDFUpload = (e) =>{
+    e.preventDefault();
+      const newFile = e.target.files[0];
+      if(newFile.type === 'application/pdf'){
+        // ok.. continue
+      }
+      else{
+        alert('Please Upload PDF file')
+      }
+  }
 
   return (
     <div className="create-exam-wrapper">
@@ -272,6 +282,7 @@ const CreateExam = () => {
                   type="file"
                   name=""
                   id="upload"
+                  onChange={handlePDFUpload}
                   accept="application/pdf"
                 />
               </div>
